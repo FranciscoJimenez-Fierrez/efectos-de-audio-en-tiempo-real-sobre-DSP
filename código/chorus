@@ -1,0 +1,141 @@
+; LPN CHORUS
+; Chorus con ruido de baja frecuencia como señal moduladora
+; Francisco Jiménez Fiérrez, 27/10/15
+
+; pot0 ==> frecuencia
+; pot1 ==> amplitud
+; pot2 ==> mezcla
+
+; Declaraciones de memoria y registros
+mem	del	80
+
+equ	input	reg0
+
+equ	pntr	reg1
+equ	read1	reg2
+equ	read2	reg3
+equ	interp	reg4
+
+equ	contador	reg5
+equ	rand	reg6
+equ	lpf1	reg7
+equ	lpf2	reg8
+equ	lpn	reg9
+
+; Coeficiente de filtrado señal de ruido
+k	equ	0.0001
+
+; Adquisición de entradas
+
+;rdax	adcl,0.5
+rdax	adcr,1
+
+wrax	input, 1
+wra	del,0
+
+; Generación del ruido de baja frecuencia
+
+or	%00000000_00010000_00000000 	;; el potenciometro 0 determina cada cuanto se adquiere la nueva muestra para el filtro paso bajo
+mulx	pot0				;; se emplea or para superar las limitaciones de sof
+rdax	contador, 1
+wrax	contador, 1
+
+sof	1, -0.99
+skp 	neg, nosat
+
+clr
+wrax	contador, 0
+
+; Los tres bits de menor peso son desplazados 
+; a las posiciones de mayor peso.
+rdax	input, 1
+and	%00000000_00000000_00000111
+
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+
+wrax	rand, 0
+nosat:
+
+; Filtrado de la señal aleatoria
+clr
+rdax	rand, 1
+rdfx	lpf1, k
+wrax	lpf1, 1
+rdfx	lpf2, k
+wrax	lpf2, 1
+wrax	lpn, 0
+
+; Obtención del puntero
+rdax	lpn, 1
+sof	0.050,0
+mulx	pot1
+wrax	pntr,1		
+
+;; Interpolación
+; Primer puntero
+wrax	addr_ptr,0
+rmpa	1
+wrax	read1,0		
+
+; Segundo puntero
+or	%00000000_00000001_00000000	
+rdax	pntr,1
+wrax	addr_ptr,0
+rmpa	1
+wrax	read2,0		
+
+; Coeficiente de interpolación
+rdax	pntr,1
+and	%00000000_00000000_11111111
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	-2,0
+sof	1.9999,0
+wrax	interp,0
+
+rdax	read2,1
+rdax	read1,-1
+mulx	interp		
+rdax	read1,1
+
+; Mezcla a la salida
+rdax	input, -1
+mulx	pot2
+rdax	input, 1
+
+wrax	dacl,1		
+wrax	dacr,0
