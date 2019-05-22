@@ -1,0 +1,111 @@
+; FLANGER
+; Fco Jiménez Fiérrez, 11/11/15
+
+; pot0 ==> frecuencia
+; pot1 ==> amplitud
+; pot2 ==> realimentación
+
+; Declaraciones de memoria y registros
+mem	del	80
+
+equ	pntr	reg0
+equ	read1	reg1
+equ	read2	reg2
+equ	interp	reg3
+
+equ	feedforward	reg4
+equ	feedback		reg5
+equ	pow	reg6
+equ	sign	reg7
+
+rate_max		equ 	50
+depth_max	equ	70
+	
+; Inicialización del LFO
+skp	run,1
+wlds	sin0,10,32767
+
+; Adquisición de parámetros
+or	rate_max<14
+mulx	pot0
+wrax 	sin0_rate, 0
+
+; Algoritmo del efecto
+rdax 	adcl,0.5
+rdax 	adcr,0.5
+wrax 	feedforward, 1
+rdax 	feedback, 0.7071
+wra 	del,0
+
+; Obtención puntero
+cho 	rdal,sin0
+sof 	0.5, 0.5
+sof 	0.008,0	; d0.008 = bS00000010000 adapta el valor del lfo a la longitud del retardo
+mulx 	pot1
+wrax 	pntr,1
+
+; Interpolación
+; Primera lectura
+wrax 	addr_ptr,0
+rmpa 	1
+wrax 	read1,0
+
+; Segunda lectura
+or %00000000_00000001_00000000
+rdax 	pntr,1
+wrax 	addr_ptr,0
+rmpa 	1
+wrax 	read2,0
+
+; Coeficiente de interpolación
+rdax 	pntr,1
+and 	%00000000_00000000_11111111
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	-2,0
+sof 	1.9999,0
+wrax 	interp,0
+
+; Interpolación entre muestras
+rdax 	read2,1
+rdax 	read1,-1
+mulx 	interp
+rdax 	read1,1
+
+wrax 	feedback, 1
+mulx 	sign
+rdax 	feedforward, 0.7071
+
+wrax 	dacl,1
+wrax 	dacr,0
+
+; Control de la realimentación
+rdax 	pot2, 1
+sof 	1, -0.5
+sof 	1.999, 0
+wrax 	pow, 1
+mulx 	pow
+mulx 	pow
+mulx 	feedback
+wrax 	feedback, 0
+
+; Aditivo/sustractivo
+rdax 	pot2, 1
+sof 	1, -0.5
+skp 	neg, 3
+sof 	0, 0.7071
+wrax 	sign, 0
+skp 	zro, 2
+sof 	0, -0.7071
+wrax 	sign, 0
