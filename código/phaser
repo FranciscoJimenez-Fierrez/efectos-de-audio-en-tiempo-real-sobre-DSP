@@ -1,0 +1,148 @@
+; PHASER
+; Fco Jiménez Fiérrez, 26/10/15
+
+; pot0 ==> frecuencia
+; pot1 ==> amplitud
+; pot2 ==> realimentación
+
+; Declaraciones de memoria y registros
+Pd	equ	reg0
+temp	equ	reg1
+feedback	equ	reg2
+
+x1	mem	2
+y1	mem	2
+x2	mem	2
+y2	mem	2
+x3	mem	2
+y3	mem	2
+x4	mem	2
+y4	mem	2
+x5	mem	2
+y5	mem	2
+x6	mem	2
+y6	mem	2
+x7	mem	2
+y7	mem	2
+x8	mem	2
+y8	mem	2
+
+; Inicialización LFO
+skp	run, 1
+wldr	rmp0, 0, 4096
+
+; Control de realimentación
+rdax	feedback, 0.7
+mulx	pot2
+wrax	feedback, 0
+
+; Adquisición de parámetros
+rdax	pot0, 1
+sof	0.05, 0
+wrax	rmp0_rate, 0
+
+; Adquisición Pd
+cho	rdal, rmp0
+sof	1, -0.25
+absa	
+sof	-2, 0
+sof	-2, 0
+mulx	pot1
+sof	-0.20, 0.96
+wrax	Pd, 0	
+
+; Adquisición de entrada
+rdax	adcr, 0.5
+rdax	adcl, 0.5
+
+; Filtros paso todo en cascada
+; ap 1
+rdax	feedback, 1
+wra	x1, 1
+mulx	Pd
+wrax	temp, 0
+rda	y1+1, 1
+mulx	Pd
+rdax	temp, 1
+rda	x1+1, -1
+wra	y1, 1
+
+; ap 2
+wra	x2, 1
+mulx	Pd
+wrax	temp, 0
+rda	y2+1, 1
+mulx	Pd
+rdax	temp, 1
+rda	x2+1, -1
+wra	y2, 1
+
+; ap 3
+wra	x3, 1
+mulx	Pd
+wrax	temp, 0
+rda	y3+1, 1
+mulx	Pd
+rdax	temp, 1
+rda	x3+1, -1
+wra	y3, 1
+
+; ap 4
+wra	x4, 1
+mulx	Pd
+wrax	temp, 0
+rda	y4+1, 1
+mulx	Pd
+rdax	temp, 1
+rda	x4+1, -1
+wra	y4, 1
+
+; ap 5
+wra	x5, 1
+mulx	Pd
+wrax	temp, 0
+rda	y5+1, 1
+mulx	Pd
+rdax	temp, 1
+rda	x5+1, -1
+wra	y5, 1
+
+; ap 6
+wra	x6, 1
+mulx	Pd
+wrax	temp, 0
+rda	y6+1, 1
+mulx	Pd
+rdax	temp, 1
+rda	x6+1, -1
+wra	y6, 1
+
+; ap 7
+wra	x7, 1
+mulx	Pd
+wrax	temp, 0
+rda	y7+1, 1
+mulx	Pd
+rdax	temp, 1
+rda	x7+1, -1
+wra	y7, 1
+
+; ap 8
+wra	x8, 1
+mulx	Pd
+wrax	temp, 0
+rda	y8+1, 1
+mulx	Pd
+rdax	temp, 1
+rda	x8+1, -1
+wra	y8, 1
+
+wrax	feedback, 1
+sof	0.5, 0
+
+; Mezcla a la salida (50 - 50)
+rdax	adcr, 0.25
+rdax	adcl, 0.25
+
+wrax	dacr, 1
+wrax	dacl, 0
