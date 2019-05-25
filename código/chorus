@@ -27,16 +27,16 @@ k	equ	0.0001
 
 ; Adquisición de entradas
 
-;rdax	adcl,0.5
-rdax	adcr,1
+rdax	adcl,0.5
+rdax	adcr,0.5
 
 wrax	input, 1
 wra	del,0
 
 ; Generación del ruido de baja frecuencia
 
-or	%00000000_00010000_00000000 	;; el potenciometro 0 determina cada cuanto se adquiere la nueva muestra para el filtro paso bajo
-mulx	pot0				;; se emplea or para superar las limitaciones de sof
+or	%00000000_00010000_00000000 	
+mulx	pot0				
 rdax	contador, 1
 wrax	contador, 1
 
