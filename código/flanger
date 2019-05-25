@@ -18,7 +18,7 @@ equ	feedback		reg5
 equ	pow	reg6
 equ	sign	reg7
 
-rate_max		equ 	50
+rate_max	equ 	50
 depth_max	equ	70
 	
 ; Inicialización del LFO
