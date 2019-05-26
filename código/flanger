@@ -1,9 +1,9 @@
 ; FLANGER
-; Fco Jiménez Fiérrez, 11/11/15
+; Fco Jiménez Fiérrez
 
-; pot0 ==> frecuencia
-; pot1 ==> amplitud
-; pot2 ==> realimentación
+; pot0 ==> frecuencia de la señal moduladora
+; pot1 ==> amplitud de la señal moduladora
+; pot2 ==> valor de la realimentación
 
 ; Declaraciones de memoria y registros
 mem	del	80
@@ -14,7 +14,7 @@ equ	read2	reg2
 equ	interp	reg3
 
 equ	feedforward	reg4
-equ	feedback		reg5
+equ	feedback	reg5
 equ	pow	reg6
 equ	sign	reg7
 
@@ -30,7 +30,7 @@ or	rate_max<14
 mulx	pot0
 wrax 	sin0_rate, 0
 
-; Algoritmo del efecto
+;; Algoritmo del efecto
 rdax 	adcl,0.5
 rdax 	adcr,0.5
 wrax 	feedforward, 1
@@ -40,11 +40,11 @@ wra 	del,0
 ; Obtención puntero
 cho 	rdal,sin0
 sof 	0.5, 0.5
-sof 	0.008,0	; d0.008 = bS00000010000 adapta el valor del lfo a la longitud del retardo
+sof 	0.008,0	;adapta el valor del lfo a la longitud del retardo
 mulx 	pot1
 wrax 	pntr,1
 
-; Interpolación
+;; Interpolación
 ; Primera lectura
 wrax 	addr_ptr,0
 rmpa 	1
