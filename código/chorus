@@ -1,10 +1,10 @@
 ; LPN CHORUS
 ; Chorus con ruido de baja frecuencia como señal moduladora
-; Francisco Jiménez Fiérrez, 27/10/15
+; Francisco Jiménez Fiérrez
 
-; pot0 ==> frecuencia
-; pot1 ==> amplitud
-; pot2 ==> mezcla
+; pot0 ==> tasa de variación de la señal moduladora
+; pot1 ==> amplitud de la señal moduladora
+; pot2 ==> mezcla señal original / señal alterada
 
 ; Declaraciones de memoria y registros
 mem	del	80
@@ -26,7 +26,6 @@ equ	lpn	reg9
 k	equ	0.0001
 
 ; Adquisición de entradas
-
 rdax	adcl,0.5
 rdax	adcr,0.5
 
@@ -34,7 +33,6 @@ wrax	input, 1
 wra	del,0
 
 ; Generación del ruido de baja frecuencia
-
 or	%00000000_00010000_00000000 	
 mulx	pot0				
 rdax	contador, 1
