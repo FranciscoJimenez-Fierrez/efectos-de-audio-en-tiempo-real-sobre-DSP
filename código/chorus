@@ -6,7 +6,7 @@
 ; pot1 ==> amplitud de la señal moduladora
 ; pot2 ==> mezcla señal original / señal alterada
 
-; Declaraciones de memoria y registros
+; Declaraciones de memoria  de retardo y registros
 mem	del	80
 
 equ	input	reg0
@@ -44,8 +44,7 @@ skp 	neg, nosat
 clr
 wrax	contador, 0
 
-; Los tres bits de menor peso son desplazados 
-; a las posiciones de mayor peso.
+;; Desplazamiento de los bit de menor peso a las posiciones de mayor peso
 rdax	input, 1
 and	%00000000_00000000_00000111
 
@@ -77,7 +76,7 @@ sof	-2,0
 wrax	rand, 0
 nosat:
 
-; Filtrado de la señal aleatoria
+;; Filtrado de la señal aleatoria
 clr
 rdax	rand, 1
 rdfx	lpf1, k
@@ -86,26 +85,26 @@ rdfx	lpf2, k
 wrax	lpf2, 1
 wrax	lpn, 0
 
-; Obtención del puntero
+; Obtención del puntero de acceso a memoria de retardo
 rdax	lpn, 1
 sof	0.050,0
 mulx	pot1
 wrax	pntr,1		
 
-;; Interpolación
-; Primer puntero
+; Interpolación
+;; Primer puntero
 wrax	addr_ptr,0
 rmpa	1
 wrax	read1,0		
 
-; Segundo puntero
+;: Segundo puntero
 or	%00000000_00000001_00000000	
 rdax	pntr,1
 wrax	addr_ptr,0
 rmpa	1
 wrax	read2,0		
 
-; Coeficiente de interpolación
+;; Coeficiente de interpolación
 rdax	pntr,1
 and	%00000000_00000000_11111111
 sof	-2,0
