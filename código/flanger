@@ -5,7 +5,7 @@
 ; pot1 ==> amplitud de la señal moduladora
 ; pot2 ==> valor de la realimentación
 
-; Declaraciones de memoria y registros
+; Declaraciones de memoria de retardo y registros
 mem	del	80
 
 equ	pntr	reg0
@@ -25,39 +25,34 @@ depth_max	equ	70
 skp	run,1
 wlds	sin0,10,32767
 
-; Adquisición de parámetros
-or	rate_max<14
-mulx	pot0
-wrax 	sin0_rate, 0
-
-;; Algoritmo del efecto
+; Algoritmo del efecto, sección previa al retardo
 rdax 	adcl,0.5
 rdax 	adcr,0.5
 wrax 	feedforward, 1
 rdax 	feedback, 0.7071
 wra 	del,0
 
-; Obtención puntero
+; Obtención del puntero de acceso a memoria de retardo
 cho 	rdal,sin0
 sof 	0.5, 0.5
 sof 	0.008,0	;adapta el valor del lfo a la longitud del retardo
 mulx 	pot1
 wrax 	pntr,1
 
-;; Interpolación
-; Primera lectura
+; Interpolación
+;; Primera lectura
 wrax 	addr_ptr,0
 rmpa 	1
 wrax 	read1,0
 
-; Segunda lectura
+;; Segunda lectura
 or %00000000_00000001_00000000
 rdax 	pntr,1
 wrax 	addr_ptr,0
 rmpa 	1
 wrax 	read2,0
 
-; Coeficiente de interpolación
+;; Coeficiente de interpolación
 rdax 	pntr,1
 and 	%00000000_00000000_11111111
 sof 	-2,0
@@ -77,12 +72,13 @@ sof 	-2,0
 sof 	1.9999,0
 wrax 	interp,0
 
-; Interpolación entre muestras
+;; Interpolación entre muestras
 rdax 	read2,1
 rdax 	read1,-1
 mulx 	interp
 rdax 	read1,1
 
+; Algoritmo de efecto, sección posterior al retardo
 wrax 	feedback, 1
 mulx 	sign
 rdax 	feedforward, 0.7071
@@ -90,7 +86,12 @@ rdax 	feedforward, 0.7071
 wrax 	dacl,1
 wrax 	dacr,0
 
-; Control de la realimentación
+; Control de la frecuencia de modulación
+or	rate_max<14
+mulx	pot0
+wrax 	sin0_rate, 0
+
+; Control del valor de realimentación
 rdax 	pot2, 1
 sof 	1, -0.5
 sof 	1.999, 0
@@ -100,7 +101,7 @@ mulx 	pow
 mulx 	feedback
 wrax 	feedback, 0
 
-; Aditivo/sustractivo
+; Control del modo de funcionamiento (aditivo/sustractivo)
 rdax 	pot2, 1
 sof 	1, -0.5
 skp 	neg, 3
