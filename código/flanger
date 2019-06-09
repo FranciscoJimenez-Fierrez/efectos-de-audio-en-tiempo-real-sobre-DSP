@@ -3,7 +3,7 @@
 
 ; pot0 ==> frecuencia de la señal moduladora
 ; pot1 ==> amplitud de la señal moduladora
-; pot2 ==> valor de la realimentación
+; pot2 ==> valor de la realimentación y modo de funcionamiento (aditivo/sustractivo)
 
 ; Declaraciones de memoria de retardo y registros
 mem	del	80
